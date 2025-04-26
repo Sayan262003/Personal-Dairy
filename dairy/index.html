@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Secret Diary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #e9d8a6;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+    .diary-cover {
+      height: 100vh;
+      width: 100%;
+      background: url('https://images.unsplash.com/photo-1508780709619-79562169bc64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80') no-repeat center/cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+    }
+    .diary-cover.fade-out { opacity: 0; pointer-events: none; }
+    .diary-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: 4rem;
+      color: #fff;
+      text-shadow: 2px 2px 5px #000;
+      margin-top: 20px;
+    }
+    .lock {
+      width: 80px; height: 80px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 15px #000;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s ease-in-out;
+    }
+    .lock::before {
+      content: ''; position: absolute; top: 15px; left: 30px;
+      width: 20px; height: 35px;
+      border: 5px solid #000;
+      border-radius: 15px 15px 0 0;
+    }
+    .lock:hover { transform: scale(1.1); box-shadow: 0 0 25px #fff; }
+    .diary-pages {
+      display: none;
+      padding: 50px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      background: url('https://www.transparenttextures.com/patterns/paper-fibers.png') repeat;
+    }
+    .entry {
+      background: #fff8dc;
+      border: 2px solid #deb887;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .entry h2 { font-size: 1.5rem; margin-bottom: 10px; }
+    .entry h3 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2rem;
+      color: #6b4226;
+      margin-bottom: 10px;
+    }
+    .entry p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 10px; }
+    .entry img { max-width: 100%; border-radius: 10px; margin-top: 10px; }
+
+    /* New top-buttons container styling */
+    .top-buttons {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 20px;
+      z-index: 1000;
+    }
+    .top-buttons button {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    body.dark { background: #222; color: #eee; }
+    #newEntryBtn {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 20px;
+      background: #6b4226;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #entryEditor {
+      display: none;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fffaf0;
+      border: 2px dashed #deb887;
+      border-radius: 15px;
+      max-width: 800px;
+    }
+    #entryEditor textarea {
+      width: 100%;
+      height: 120px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    #entryEditor input[type="file"] {
+      display: block;
+      margin: 10px 0;
+    }
+    #saveEntryBtn {
+      margin-top: 10px;
+      padding: 10px 18px;
+      background: #8b4513;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Delete Entry Button Styling */
+    /* Delete Entry Button Styling */
+.delete-entry-btn {
+  background: #f44336;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  z-index: 10; /* Ensure the button is always on top */
+}
+
+.delete-entry-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(255, 0, 0, 0.5);
+}
+
+/* Ensure visibility of Delete Button in dark mode */
+body.dark .delete-entry-btn {
+  background: #f44336; /* Red stays the same */
+  color: #fff;
+}
+
+    /* Dark Mode Adjustments */
+    body.dark .entry {
+      background: #333;
+      border-color: #555;
+      color: #eee;
+    }
+
+    body.dark .entry h2,
+    body.dark .entry h3 {
+      color: #ffd700;
+    }
+
+    body.dark .entry p {
+      color: #ddd;
+    }
+
+    body.dark #entryEditor {
+      background: #333;
+      border-color: #555;
+      color: #eee;
+    }
+
+    body.dark #entryEditor textarea {
+      background: #222;
+      color: #eee;
+      border: 1px solid #555;
+    }
+
+    body.dark #saveEntryBtn,
+    body.dark #newEntryBtn {
+      background: #444;
+      color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- New top-buttons container -->
+  <div class="top-buttons">
+    <button id="musicToggle">🎵 Play Music</button>
+    <button id="toggleMode">🌙 Toggle Mode</button>
+  </div>
+
+  <audio id="bgMusic" src="https://www.bensound.com/bensound-music/bensound-sunny.mp3"></audio>
+
+  <div class="diary-cover" id="cover">
+    <div class="lock" id="lock"></div>
+    <h1 class="diary-title">My Secret Diary</h1>
+  </div>
+
+  <div class="diary-pages" id="pages">
+    <button id="newEntryBtn">+ Add New Entry</button>
+    <div id="entryEditor">
+      <textarea id="newEntryText" placeholder="Write your diary entry here..."></textarea>
+      <input type="file" id="entryImage" accept="image/*">
+      <button id="saveEntryBtn">Save Entry</button>
+    </div>
+    <div class="entry">
+      <h2>📅 23 April 2025</h2>
+      <h3>Dear Diary,</h3>
+      <p>Today I started working on my final year web project — and I’m building you, my personal diary! I feel excited to make this look beautiful and interactive just like an old-school journal.</p>
+      <img src="https://source.unsplash.com/400x200/?notebook,writing" alt="Demo Diary Image">
+      <button class="delete-entry-btn">Delete Entry</button>
+    </div>
+  </div>
+
+  <script>
+    const lock = document.getElementById('lock');
+    const cover = document.getElementById('cover');
+    const pages = document.getElementById('pages');
+    const bgMusic = document.getElementById('bgMusic');
+    const toggleMode = document.getElementById('toggleMode');
+    const musicToggle = document.getElementById('musicToggle');
+    const newEntryBtn = document.getElementById('newEntryBtn');
+    const entryEditor = document.getElementById('entryEditor');
+    const saveEntryBtn = document.getElementById('saveEntryBtn');
+    const newEntryText = document.getElementById('newEntryText');
+    const entryImage = document.getElementById('entryImage');
+
+    lock.addEventListener('click', () => {
+      cover.classList.add('fade-out');
+      pages.style.display = 'block';
+    });
+
+    toggleMode.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+    });
+
+    musicToggle.addEventListener('click', () => {
+      if (bgMusic.paused) {
+        bgMusic.play();
+        musicToggle.textContent = '🎵 Pause Music';
+      } else {
+        bgMusic.pause();
+        musicToggle.textContent = '🎵 Play Music';
+      }
+    });
+
+    newEntryBtn.addEventListener('click', () => {
+      entryEditor.style.display = 'block';
+    });
+
+    saveEntryBtn.addEventListener('click', () => {
+      const text = newEntryText.value.trim();
+      const imageFile = entryImage.files[0];
+      if (text) {
+        const newEntry = document.createElement('div');
+        newEntry.className = 'entry';
+        let entryHTML = `<h2>📅 ${new Date().toLocaleDateString()}</h2><h3>New Entry</h3><p>${text}</p>`;
+        if (imageFile) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            entryHTML += `<img src="${e.target.result}" alt="User uploaded image">`;
+            newEntry.innerHTML = entryHTML;
+            pages.insertBefore(newEntry, newEntryBtn);
+          };
+          reader.readAsDataURL(imageFile);
+        } else {
+          newEntry.innerHTML = entryHTML;
+          pages.insertBefore(newEntry, newEntryBtn);
+        }
+        newEntryText.value = '';
+        entryImage.value = '';
+        entryEditor.style.display = 'none';
+      }
+    });
+
+    // Delete entry functionality
+    pages.addEventListener('click', (e) => {
+      if (e.target.classList.contains('delete-entry-btn')) {
+        e.target.parentElement.remove();
+      }
+    });
+  </script>
+</body>
+</html>
