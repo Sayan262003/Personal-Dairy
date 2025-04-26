@@ -7,11 +7,17 @@ Description :- A beautiful, interactive personal diary web application built wit
  Features :-
 
 📖 Add and save personal diary entries
+
 🖼️ Upload and attach images to your entries
+
 🗑️ Delete individual entries
+
 🌙 Toggle between Light and Dark mode
+
 🎶 Play/Pause calming background music
+
 📱 Fully responsive design
+
 🎨 Beautiful, nostalgic design with old-school diary vibes
 
 
